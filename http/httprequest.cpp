@@ -75,6 +75,10 @@ QString Request::header(QString headerName) const {
     return _headers.value(headerName);
 }
 
+QMap<QString, QString> Request::getParameters() {
+    return _getParameters;
+}
+
 QByteArray Request::body() const {
     return _body;
 }
@@ -131,6 +135,7 @@ QByteArray Request::takeLine(QByteArray& rawRequest) {
 
 void Request::setDefaults() {
     _headers.clear();
+    _getParameters.clear();
     _urlParameters.clear();
     _valid = false;
     _method = "";
@@ -158,6 +163,16 @@ void Request::deserialize(QByteArray rawRequest) {
     QStringList splittedURI = requestLine.at(1).split('?', QString::SkipEmptyParts);
     if(splittedURI.count() > 1) {
         _urlParameters = Util::FormUrlCodec::decodeFormUrl(splittedURI.at(1).toUtf8());
+        // add get parameters
+        QStringList getData = splittedURI.at(1).split('&', QString::SkipEmptyParts);
+        for(int i=0; i < getData.count(); i++)
+        {
+            QStringList get = getData.at(i).split('=', QString::SkipEmptyParts);
+            if(get.count() == 2)
+            {
+                _getParameters.insert(get.at(0), get.at(1));
+            }
+        }
     }
 
     _uniqueResourceIdentifier = splittedURI.at(0);

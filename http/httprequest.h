@@ -71,6 +71,9 @@ public:
     /** @returns a map of request headers (name and value). **/
     QMap<QString, QString> headers() const;
 
+    /** @returns a map of get http parametrs (name and value) **/
+    QMap<QString, QString> getParameters();
+
     QString header(Header header) const;
     QString header(QString headerName) const;
 
@@ -98,6 +101,7 @@ private:
     bool _valid;
     QMap<QString, QByteArray> _urlParameters;
     QMap<QString, QString> _headers;
+    QMap<QString, QString> _getParameters;
 };
 
 }
