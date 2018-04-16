@@ -75,6 +75,14 @@ QString Request::header(QString headerName) const {
     return _headers.value(headerName);
 }
 
+QMap<QString, QString> Request::getParameters() const{
+    return _getParameters;
+}
+
+QMap<QString, QString> Request::postParameters() const {
+    return _postParameters;
+}
+
 QByteArray Request::body() const {
     return _body;
 }
@@ -131,6 +139,8 @@ QByteArray Request::takeLine(QByteArray& rawRequest) {
 
 void Request::setDefaults() {
     _headers.clear();
+    _getParameters.clear();
+    _postParameters.clear();
     _urlParameters.clear();
     _valid = false;
     _method = "";
@@ -145,6 +155,8 @@ void Request::deserialize(QByteArray rawRequest) {
     QStringList requestLine = QString::fromUtf8(rawRequestLine)
                                 .split(QRegExp("\\s+"));
 
+    QStringList rawRequestLines = QString::fromUtf8(rawRequest).split("\n");
+
     if(requestLine.count() < 3) {
         // The request line has to contain three strings: The method
         // string, the request uri and the HTTP version. If we were
@@ -155,9 +167,38 @@ void Request::deserialize(QByteArray rawRequest) {
 
     _method = requestLine.at(0).toLower();
 
+    //add post paremeters
+    if(_method == "post")
+    {
+        log("We get POST!");
+        QString postLine = rawRequestLines.at(rawRequestLines.count()-1);
+        if(!postLine.isEmpty())
+        {
+            QStringList postData = postLine.split('&', QString::SkipEmptyParts);
+            for(int i=0; i < postData.count(); i++)
+            {
+                QStringList post = postData.at(i).split('=', QString::SkipEmptyParts);
+                if(post.count() == 2)
+                {
+                    _postParameters.insert(post.at(0),post.at(1));
+                }
+            }
+        }
+    }
+
     QStringList splittedURI = requestLine.at(1).split('?', QString::SkipEmptyParts);
     if(splittedURI.count() > 1) {
         _urlParameters = Util::FormUrlCodec::decodeFormUrl(splittedURI.at(1).toUtf8());
+        // add get parameters
+        QStringList getData = splittedURI.at(1).split('&', QString::SkipEmptyParts);
+        for(int i=0; i < getData.count(); i++)
+        {
+            QStringList get = getData.at(i).split('=', QString::SkipEmptyParts);
+            if(get.count() == 2)
+            {
+                _getParameters.insert(get.at(0), get.at(1));
+            }
+        }
     }
 
     _uniqueResourceIdentifier = splittedURI.at(0);
