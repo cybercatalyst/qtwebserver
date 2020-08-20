@@ -40,8 +40,9 @@ Resource::Resource(QString uniqueIdentifier,
 bool Resource::match(QString uniqueIdentifier) {
     // Split both the unique identifier of this resource the one in question,
     // so we can compare those.
-    QStringList splittedReferenceUri = this->uniqueIdentifier().split("/", QString::SkipEmptyParts);
-    QStringList splittedRequestedUri = uniqueIdentifier.split("/", QString::SkipEmptyParts);
+    QRegExp separator("[(.|/)]");
+    QStringList splittedReferenceUri = this->uniqueIdentifier().split(separator, QString::SkipEmptyParts);
+    QStringList splittedRequestedUri = uniqueIdentifier.split(separator, QString::SkipEmptyParts);
 
     int count = splittedRequestedUri.count();
 
@@ -69,8 +70,9 @@ bool Resource::match(QString uniqueIdentifier) {
 QMap<QString, QString> Resource::uriParameters(QString uniqueIdentifier) {
     // Split both the unique identifier of this resource the one in question,
     // so we can compare those.
-    QStringList splittedReferenceUri = this->uniqueIdentifier().split("/", QString::SkipEmptyParts);
-    QStringList splittedRequestedUri = uniqueIdentifier.split("/", QString::SkipEmptyParts);
+    QRegExp separator("[(.|/)]");
+    QStringList splittedReferenceUri = this->uniqueIdentifier().split(separator, QString::SkipEmptyParts);
+    QStringList splittedRequestedUri = uniqueIdentifier.split(separator, QString::SkipEmptyParts);
 
     // Create a parameter map.
     QMap<QString, QString> uriParameterMap;
