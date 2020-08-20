@@ -73,6 +73,7 @@ public:
      * will match
      *  /service/user1/23
      *  /service/user4/29
+     * /service/users/{id}.json will match /service/users/{id}.json
      * @returns the unique resource identifier for this resource.
      */
     QString uniqueIdentifier();
